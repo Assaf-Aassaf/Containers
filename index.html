@@ -1,0 +1,229 @@
+<title>Why Containers, Why VMs</title>
+<style>
+/* Layout: problem-first explainer — why each exists, scenario picker, sweet-spot triggers, real tools, mechanics hidden */
+:root{
+  --bg:#0e1419; --panel:#141d26; --panel2:#18232e; --edge:#243442;
+  --fg:#cdd9e1; --dim:#7c8c99;
+  --teal:#46d8c8;      /* container */
+  --blue:#6aa8ff;      /* VM */
+  --good:#54d98c;
+  color-scheme:dark;
+  --f-disp:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);margin:0;font-family:var(--f-disp);
+  line-height:1.55;font-size:15px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding-block:30px;padding-left:18px;padding-right:18px}
+
+h1{font-size:29px;line-height:1.12;margin:0 0 8px;letter-spacing:-.02em;text-wrap:balance}
+h1 .t{color:var(--teal)} h1 .b{color:var(--blue)}
+.sub{color:var(--dim);margin:0 0 30px;font-size:15px;max-width:60ch}
+h2{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
+  font-family:var(--f-mono);font-weight:600;margin:38px 0 14px;display:flex;align-items:center;gap:10px}
+h2::after{content:"";flex:1;height:1px;background:var(--edge)}
+
+/* ---- the two "why" cards ---- */
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.pair{grid-template-columns:1fr}}
+.card{border:1px solid var(--edge);border-radius:13px;padding:18px;background:var(--panel)}
+.card.t{border-top:3px solid var(--teal)}
+.card.b{border-top:3px solid var(--blue)}
+.card .lbl{font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.card.t .lbl{color:var(--teal)} .card.b .lbl{color:var(--blue)}
+.card .pain{font-size:15.5px;font-weight:600;margin:9px 0 2px;line-height:1.35}
+.card .pain::before{content:"\201C";opacity:.4}
+.card .pain::after{content:"\201D";opacity:.4}
+.card .fix{color:var(--dim);font-size:14px;margin-top:12px}
+.card .fix b{color:var(--fg);font-weight:600}
+.card .is{margin-top:14px;padding-top:13px;border-top:1px solid var(--edge);font-size:13.5px}
+.card.t .is b{color:var(--teal)} .card.b .is b{color:var(--blue)}
+
+/* ---- scenario picker ---- */
+.pick{color:var(--dim);font-size:14px;margin:0 0 14px}
+.scn{display:grid;gap:9px}
+.scn button{text-align:left;font:inherit;font-size:14px;cursor:pointer;color:var(--fg);
+  background:var(--panel);border:1px solid var(--edge);border-radius:10px;padding:13px 15px;transition:.14s;
+  display:flex;align-items:center;gap:12px}
+.scn button:hover{border-color:var(--dim)}
+.scn button .q{flex:1;min-width:0}
+.scn button .pin{font-family:var(--f-mono);font-size:11px;font-weight:700;letter-spacing:.08em;
+  opacity:0;transition:.14s;flex-shrink:0;padding:3px 9px;border-radius:20px}
+.scn button.on{background:var(--panel2)}
+.scn button.on.t{border-color:var(--teal)} .scn button.on.b{border-color:var(--blue)}
+.scn button.on .pin{opacity:1}
+.scn button.on.t .pin{color:#06141a;background:var(--teal)}
+.scn button.on.b .pin{color:#06141a;background:var(--blue)}
+.answer{margin-top:14px;font-size:14px;padding:13px 15px;border-radius:10px;background:var(--panel2);
+  border:1px solid var(--edge);transition:.15s}
+.answer.t{border-color:rgba(70,216,200,.45)} .answer.b{border-color:rgba(106,168,255,.45)}
+.answer b{color:var(--fg)}
+.answer .w{font-family:var(--f-mono);font-weight:700;font-size:13px}
+.answer.t .w{color:var(--teal)} .answer.b .w{color:var(--blue)}
+
+/* ---- sweet-spot triggers ---- */
+.spot{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.spot{grid-template-columns:1fr}}
+.spot .s{border:1px solid var(--edge);border-radius:13px;padding:17px;background:var(--panel)}
+.spot .s.t{border-left:3px solid var(--teal)} .spot .s.b{border-left:3px solid var(--blue)}
+.spot .s h3{margin:0 0 11px;font-size:14px;font-family:var(--f-mono);font-weight:600}
+.spot .s.t h3{color:var(--teal)} .spot .s.b h3{color:var(--blue)}
+.spot ul{margin:0;padding:0;list-style:none}
+.spot li{position:relative;padding-left:20px;margin:9px 0;font-size:13.8px;line-height:1.45}
+.spot li::before{position:absolute;left:0;top:0;font-family:var(--f-mono)}
+.spot .s.t li::before{content:"\2192";color:var(--teal)}
+.spot .s.b li::before{content:"\2192";color:var(--blue)}
+.spot li b{color:var(--fg);font-weight:600}
+.spot .s.t .star{margin-top:12px;padding:9px 11px;border-radius:8px;font-size:12.5px;
+  background:rgba(70,216,200,.1);color:var(--teal);font-family:var(--f-mono)}
+.spot .s.b .star{margin-top:12px;padding:9px 11px;border-radius:8px;font-size:12.5px;
+  background:rgba(106,168,255,.1);color:var(--blue);font-family:var(--f-mono)}
+
+/* ---- tools ---- */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.tools{grid-template-columns:1fr}}
+.tcol{border:1px solid var(--edge);border-radius:13px;background:var(--panel);overflow:hidden}
+.tcol .head{padding:12px 16px;font-family:var(--f-mono);font-size:13px;font-weight:600;letter-spacing:.06em}
+.tcol.t .head{color:var(--teal);background:rgba(70,216,200,.08)}
+.tcol.b .head{color:var(--blue);background:rgba(106,168,255,.08)}
+.trow{padding:11px 16px;border-top:1px solid var(--edge);display:flex;gap:10px;align-items:baseline}
+.trow .nm{font-family:var(--f-mono);font-size:13.5px;font-weight:600;flex-shrink:0;min-width:92px}
+.tcol.t .trow .nm{color:var(--fg)} .tcol.b .trow .nm{color:var(--fg)}
+.trow .d{color:var(--dim);font-size:13px;min-width:0}
+
+/* ---- mechanics (collapsed) ---- */
+.hood{border:1px solid var(--edge);border-radius:11px;background:var(--panel);overflow:hidden}
+.hood summary{cursor:pointer;padding:14px 16px;font-size:14px;font-weight:600;list-style:none;
+  display:flex;align-items:center;gap:10px}
+.hood summary::-webkit-details-marker{display:none}
+.hood summary .chev{color:var(--dim);transition:.2s;font-family:var(--f-mono)}
+.hood[open] summary .chev{transform:rotate(90deg)}
+.hood summary small{color:var(--dim);font-weight:400;margin-left:auto}
+.hood .body{padding:0 16px 16px;font-size:13.5px;color:var(--dim)}
+.hood .body b{color:var(--teal)}
+.hood .body p{margin:6px 0 0}
+.tiny{color:var(--dim);font-size:12px;text-align:center;margin-top:30px;font-family:var(--f-mono)}
+</style>
+
+<div class="wrap">
+  <h1>Why bother with a <span class="t">container</span> or a <span class="b">VM</span>?</h1>
+  <p class="sub">Forget the plumbing for a second. Each one exists to kill a specific, annoying problem. Start there.</p>
+
+  <h2>The problem each one solves</h2>
+  <div class="pair">
+    <div class="card t">
+      <div class="lbl">Container</div>
+      <div class="pain">Project A needs Python 3.8, project B needs 3.11 — on the same machine.</div>
+      <div class="fix"><b>Fix:</b> give each app its own sealed box with its <b>own exact versions</b> inside. They never collide, and the box runs the same on any machine.</div>
+      <div class="is">A container is <b>just your app + the exact versions it needs.</b></div>
+    </div>
+    <div class="card b">
+      <div class="lbl">Virtual Machine</div>
+      <div class="pain">I need a whole separate computer — maybe a different OS — walled off and safe.</div>
+      <div class="fix"><b>Fix:</b> carve a <b>full fake computer</b> out of one physical machine. Its own OS, totally sealed. Trash it and the real machine never notices.</div>
+      <div class="is">A VM is <b>a complete pretend computer.</b> OS and all.</div>
+    </div>
+  </div>
+
+  <h2>So which fits your situation?</h2>
+  <p class="pick">Tap what sounds like you — I'll point you at the right one.</p>
+  <div class="scn" id="scn"></div>
+  <div class="answer" id="ans" style="opacity:.55">Pick a situation above \2191</div>
+
+  <h2>Reach for each when\2026</h2>
+  <div class="spot">
+    <div class="s t">
+      <h3>Reach for a CONTAINER when</h3>
+      <ul>
+        <li>Two projects need <b>different versions</b> of a language or library at once (Python 3.8 vs 3.11, Node 16 vs 20)</li>
+        <li>You want the <b>exact same setup</b> on your laptop, the test box, and production</li>
+        <li>You need <b>many light copies</b> that start in seconds and scale on demand</li>
+        <li>You want a <b>throwaway</b> service in one command (spin up a database, trash it after)</li>
+      </ul>
+      <div class="star">sweet spot: version chaos on one machine</div>
+    </div>
+    <div class="s b">
+      <h3>Reach for a VM when</h3>
+      <ul>
+        <li>You need a <b>different operating system</b> — run Windows software on Linux, or test on an OS you don't own</li>
+        <li>You're opening something <b>dangerous</b> — malware, an untrusted tool — and want it fully sealed from your real machine</li>
+        <li>You need a <b>complete, lasting computer</b> (a server, a full desktop), not just one app</li>
+        <li>Software needs <b>deep OS or kernel access</b> a container can't fake</li>
+      </ul>
+      <div class="star">sweet spot: a sealed computer of its own</div>
+    </div>
+  </div>
+
+  <h2>Tools you'll actually hear</h2>
+  <div class="tools">
+    <div class="tcol t">
+      <div class="head">// container world</div>
+      <div class="trow"><span class="nm">Docker</span><span class="d">the famous one — builds and runs containers</span></div>
+      <div class="trow"><span class="nm">Podman</span><span class="d">like Docker, no background service running</span></div>
+      <div class="trow"><span class="nm">Kubernetes</span><span class="d">runs thousands of containers across many machines</span></div>
+      <div class="trow"><span class="nm">containerd</span><span class="d">the low-level engine under Docker</span></div>
+    </div>
+    <div class="tcol b">
+      <div class="head">// VM world</div>
+      <div class="trow"><span class="nm">VirtualBox</span><span class="d">free, easy, runs on your desktop</span></div>
+      <div class="trow"><span class="nm">VMware</span><span class="d">desktop (Workstation) + enterprise servers (ESXi)</span></div>
+      <div class="trow"><span class="nm">Hyper-V</span><span class="d">built right into Windows</span></div>
+      <div class="trow"><span class="nm">QEMU / KVM</span><span class="d">the engine behind Linux VMs</span></div>
+    </div>
+  </div>
+
+  <h2>The whole difference, one line</h2>
+  <div class="spot">
+    <div class="s t" style="text-align:center">
+      <div style="font-size:17px;font-weight:600;color:var(--teal);margin-bottom:6px">Container</div>
+      <div>packages the <b style="color:var(--fg)">app</b></div>
+      <div style="color:var(--dim);font-size:13px;font-family:var(--f-mono);margin-top:10px;line-height:1.9">weight \00B7 <span style="color:var(--fg)">light (MBs)</span><br>starts \00B7 <span style="color:var(--fg)">instant</span><br>walls \00B7 <span style="color:var(--fg)">thinner</span></div>
+    </div>
+    <div class="s b" style="text-align:center">
+      <div style="font-size:17px;font-weight:600;color:var(--blue);margin-bottom:6px">Virtual Machine</div>
+      <div>packages a whole <b style="color:var(--fg)">computer</b></div>
+      <div style="color:var(--dim);font-size:13px;font-family:var(--f-mono);margin-top:10px;line-height:1.9">weight \00B7 <span style="color:var(--fg)">heavy (GBs)</span><br>starts \00B7 <span style="color:var(--fg)">minutes</span><br>walls \00B7 <span style="color:var(--fg)">thick</span></div>
+    </div>
+  </div>
+
+  <h2>Only if you're curious</h2>
+  <details class="hood">
+    <summary><span class="chev">\25B8</span> How a container stays sealed without a full OS <small>the technical bit</small></summary>
+    <div class="body">
+      <p>It borrows the host computer's engine (the <b>kernel</b>) instead of carrying its own — that's why it's so light. Two cheap tricks build the wall:</p>
+      <p><b>namespaces</b> \2192 give it blinders, so it only sees its own stuff, not the rest of the machine.</p>
+      <p><b>cgroups</b> \2192 put it on a leash, so it can't hog all the CPU or memory.</p>
+      <p style="margin-top:10px">That's the entire magic. A VM skips both because it just runs a real, separate OS on fake hardware.</p>
+    </div>
+  </details>
+
+  <p class="tiny">container = packaged app, light &amp; fast \00B7 VM = whole fake computer, heavy &amp; sealed</p>
+</div>
+
+<script>
+const S=[
+  {q:"Two projects need clashing versions of the same tool",a:"c",r:"Each gets its own sealed box with its own version. No collision."},
+  {q:"My app works here but breaks on the server",a:"c",r:"The box carries its exact environment, so “here” and “there” become the same place."},
+  {q:"I want to run Windows software on a Linux box",a:"b",r:"Different OS = you need a whole different computer. That's a VM's whole job."},
+  {q:"I'm analyzing malware and want it fully walled off",a:"b",r:"A VM's thick walls mean if it gets wrecked, your real machine is untouched."},
+  {q:"I need 100 cheap copies of my app, scaling fast",a:"c",r:"Containers are light enough to stamp out by the hundred and spin up in seconds."},
+  {q:"Rent out one big server as several separate machines",a:"b",r:"Each tenant gets a full, isolated computer — exactly what a VM is."}
+];
+const A={
+  c:{w:"\2192 Container"},
+  b:{w:"\2192 Virtual Machine"}
+};
+const scn=document.getElementById('scn'),ans=document.getElementById('ans');
+S.forEach((s)=>{
+  const btn=document.createElement('button');
+  btn.className=s.a;
+  btn.innerHTML=`<span class="q">${s.q}</span><span class="pin">${s.a==='c'?'CONTAINER':'VM'}</span>`;
+  btn.onclick=()=>{
+    [...scn.children].forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    ans.className='answer '+s.a;ans.style.opacity='1';
+    ans.innerHTML=`<span class="w">${A[s.a].w}</span> &nbsp; ${s.r}`;
+  };
+  scn.appendChild(btn);
+});
+</script>
