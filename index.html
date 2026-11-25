@@ -1,3 +1,6 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why Containers, Why VMs</title>
 <style>
 /* Compact problem-first explainer: two cards, one picker, tools, mechanics drawer. Tight vertical rhythm for phones. */
@@ -17,13 +20,16 @@ body{background:var(--bg);color:var(--fg);margin:0;font-family:var(--f-disp);
 h1{font-size:27px;line-height:1.14;margin:0 0 7px;letter-spacing:-.02em;text-wrap:balance}
 h1 .t{color:var(--teal)} h1 .b{color:var(--blue)}
 .sub{color:var(--dim);margin:0 0 8px;font-size:14.5px;max-width:52ch}
-h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);
-  font-family:var(--f-mono);font-weight:600;margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+h2{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);
+  font-family:var(--f-mono);font-weight:600;margin:40px 0 14px;display:flex;align-items:center;gap:11px}
+h2 .n{color:var(--dim)}
+h2::before{content:"";width:16px;height:2px;background:var(--teal);border-radius:2px;flex-shrink:0}
 h2::after{content:"";flex:1;height:1px;background:var(--edge)}
+section{scroll-margin-top:16px}
 
 /* ---- two core cards ---- */
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:580px){.pair{grid-template-columns:1fr}}
+@media(max-width:640px){.pair{grid-template-columns:1fr}}
 .card{border:1px solid var(--edge);border-radius:13px;padding:16px;background:var(--panel)}
 .card.t{border-top:3px solid var(--teal)} .card.b{border-top:3px solid var(--blue)}
 .card .lbl{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
@@ -61,7 +67,7 @@ h2::after{content:"";flex:1;height:1px;background:var(--edge)}
 
 /* ---- tools ---- */
 .tools{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:580px){.tools{grid-template-columns:1fr}}
+@media(max-width:640px){.tools{grid-template-columns:1fr}}
 .tcol{border:1px solid var(--edge);border-radius:12px;background:var(--panel);overflow:hidden}
 .tcol .head{padding:10px 14px;font-family:var(--f-mono);font-size:12px;font-weight:600;letter-spacing:.05em}
 .tcol.t .head{color:var(--teal);background:rgba(70,216,200,.08)}
